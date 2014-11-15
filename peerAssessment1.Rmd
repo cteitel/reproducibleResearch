@@ -22,12 +22,12 @@ activity$date=as.Date(activity$date)
 
 stepsPerDay=tapply(activity$steps,activity$date,sum)
 
-hist(activity$steps,col=rgb(.5,.5,.5),breaks=20,
+hist(stepsPerDay,col=rgb(.5,.5,.5),breaks=20,
      xlab='Number of steps',main='Number of steps taken per day')
 ```
 
 The mean number of steps taken each day is ```r mean(na.omit(stepsPerDay))```.  
-The median number of steps taken each day is ```r median(na.omit(stepsPerDay))```
+The median number of steps taken each day is ```r median(na.omit(stepsPerDay))```.
 
 #What is the average daily activity pattern?
 
@@ -45,22 +45,61 @@ plot(stepsPerInterval~intervals,main='Daily Activity Time Series',
 
 #Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
-Imputing missing values
+First, deal with missing values in the dataset
+```{r count missing values}
+dataNA=which(is.na(activity$steps))
+```
+There are ```r length(dataNA)``` missing values in the data. I will replace these values
+with the mean value for that interval.
 
-Note that there are a number of days/intervals where there are missing values (coded as NA). The presence of missing days may introduce bias into some calculations or summaries of the data.
+```{r replace missing values}
+dataNAIntervalID=activity[dataNA,'interval']
 
-Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)
+activityNoNA=activity
+activityNoNA[dataNA,'steps']=stepsPerInterval[as.character(dataNAIntervalID)]
+```
 
-Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.
 
-Create a new dataset that is equal to the original dataset but with the missing data filled in.
+When missing values are replaced in this way, the distribution of steps taken
+per day looks like this:
+```{r histogram no missing data}
 
-Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
+stepsPerDayNoNA=tapply(activityNoNA$steps,activityNoNA$date,sum)
+
+hist(stepsPerDayNoNA,col=rgb(.5,.5,.5),breaks=20,
+     xlab='Number of steps',main='Number of steps taken per day')
+
+```
+
+The mean number of steps taken per day is now ```r mean(stepsPerDayNoNA)```.  
+The median number of steps taken per day is now ```r median(stepsPerDayNoNA)```.
+
+On average, imputting the missing data values increases the number of steps per day
+by ```r (mean(stepsPerDayNoNA)-mean(stepsPerDay))/mean(stepsPerDay)```%.  
+
 
 #Are there differences in activity patterns between weekdays and weekends?
 
-For this part the weekdays() function may be of some help here. Use the dataset with the filled-in missing values for this part.
+```{r weekends}
 
-Create a new factor variable in the dataset with two levels - "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.
+activityNoNA$dayName=weekdays(activityNoNA$date)
+activityNoNA$weekend='weekday'
+activityNoNA[which(is.element(activityNoNA$dayName,c('Saturday','Sunday'))),
+             'weekend']='weekend'
 
-Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). See the README file in the GitHub repository to see an example of what this plot should look like using simulated data.
+par(mfrow=c(2,1),oma=c(0,0,3,0))
+for(i in c('weekday','weekend')){
+    temp=activityNoNA[which(activityNoNA$weekend==i),]
+    
+    stepsPerInterval=tapply(temp$steps,temp$interval,
+                            function(steps) mean(na.omit(steps)))
+    intervals=unique(temp$interval)
+    
+    plot(stepsPerInterval~intervals,main=i,ylim=c(0,max(stepsPerInterval)),
+         xlab='Interval',ylab='Mean number of steps',type='l')
+
+}
+mtext('Daily Activity Time Series',outer=T)
+```
+
+
