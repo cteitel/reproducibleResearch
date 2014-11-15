@@ -1,0 +1,66 @@
+Peer Assessment 1
+=======================
+
+```{r setwd, echo=FALSE}
+rm(list=ls());gc()
+setwd('C:/Users/cteitelbaum/Dropbox/reproducibleResearch')
+```
+
+#Loading and preprocessing the data
+
+```{r load and examine data}
+activity=read.csv('activity.csv')
+
+names(activity)
+summary(activity)
+activity$date=as.Date(activity$date)
+```
+
+#What is mean total number of steps taken per day?
+
+```{r histogram}
+
+stepsPerDay=tapply(activity$steps,activity$date,sum)
+
+hist(activity$steps,col=rgb(.5,.5,.5),breaks=20,
+     xlab='Number of steps',main='Number of steps taken per day')
+```
+
+The mean number of steps taken each day is ```r mean(na.omit(stepsPerDay))```.  
+The median number of steps taken each day is ```r median(na.omit(stepsPerDay))```
+
+#What is the average daily activity pattern?
+
+```{r daily activity pattern}
+
+stepsPerInterval=tapply(activity$steps,activity$interval,
+                        function(steps) mean(na.omit(steps)))
+intervals=unique(activity$interval)
+
+plot(stepsPerInterval~intervals,main='Daily Activity Time Series',
+     xlab='Interval',ylab='Mean number of steps',type='l')
+
+```
+
+
+#Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
+
+Imputing missing values
+
+Note that there are a number of days/intervals where there are missing values (coded as NA). The presence of missing days may introduce bias into some calculations or summaries of the data.
+
+Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)
+
+Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.
+
+Create a new dataset that is equal to the original dataset but with the missing data filled in.
+
+Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day. Do these values differ from the estimates from the first part of the assignment? What is the impact of imputing missing data on the estimates of the total daily number of steps?
+
+#Are there differences in activity patterns between weekdays and weekends?
+
+For this part the weekdays() function may be of some help here. Use the dataset with the filled-in missing values for this part.
+
+Create a new factor variable in the dataset with two levels - "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.
+
+Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). See the README file in the GitHub repository to see an example of what this plot should look like using simulated data.
