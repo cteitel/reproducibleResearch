@@ -6,7 +6,7 @@ rm(list=ls());gc()
 setwd('C:/Users/cteitelbaum/Dropbox/reproducibleResearch')
 ```
 
-#Loading and preprocessing the data
+##Loading and preprocessing the data
 
 ```{r load and examine data}
 activity=read.csv('activity.csv')
@@ -16,7 +16,7 @@ summary(activity)
 activity$date=as.Date(activity$date)
 ```
 
-#What is mean total number of steps taken per day?
+##What is mean total number of steps taken per day?
 
 ```{r histogram}
 par(mfrow=c(1,1),mar=c(5,4,2,2))
@@ -30,7 +30,7 @@ hist(stepsPerDay,col=rgb(.5,.5,.5),breaks=20,
 The mean number of steps taken each day is ```r mean(stepsPerDay)```.  
 The median number of steps taken each day is ```r median(stepsPerDay)```.
 
-#What is the average daily activity pattern?
+##What is the average daily activity pattern?
 
 ```{r daily activity pattern}
 
@@ -44,7 +44,7 @@ plot(stepsPerInterval~intervals,main='Daily Activity Time Series',
 ```
 
 
-#Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
+##Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
 First, deal with missing values in the dataset
 ```{r count missing values}
@@ -79,7 +79,7 @@ On average, imputting the missing data values increases the number of steps per 
 by ```r (mean(stepsPerDayNoNA)-mean(stepsPerDay))/mean(stepsPerDay)```%.  
 
 
-#Are there differences in activity patterns between weekdays and weekends?
+##Are there differences in activity patterns between weekdays and weekends?
 
 ```{r weekends}
 
@@ -88,19 +88,34 @@ activityNoNA$weekend='weekday'
 activityNoNA[which(is.element(activityNoNA$dayName,c('Saturday','Sunday'))),
              'weekend']='weekend'
 
-par(mfrow=c(2,1),oma=c(2,2,3,0),mar=c(2,3,2,3))
-for(i in c('weekday','weekend')){
-    temp=activityNoNA[which(activityNoNA$weekend==i),]
-    
-    stepsPerInterval=tapply(temp$steps,temp$interval,
-                            function(steps) mean(na.omit(steps)))
-    intervals=unique(temp$interval)
-    
-    plot(stepsPerInterval~intervals,main=i,ylim=c(0,250),
-         type='l',xlab='',ylab='')
+par(mfrow=c(2,1),mar=c(1,3,3,3),oma=c(3,3,3,0))
 
+temp=activityNoNA[which(activityNoNA$weekend=='weekday'),]
+    
+stepsPerInterval=tapply(temp$steps,temp$interval,
+                            function(steps) mean(na.omit(steps)))
+intervals=unique(temp$interval)
+    
+plot(stepsPerInterval~intervals,ylim=c(0,250),
+         type='l',xlab='',ylab='',axes=F)
+box()
+axis(4)
+mtext('Weekday')
+
+par(mar=c(3,3,1,3))
+temp=activityNoNA[which(activityNoNA$weekend=='weekend'),]
+    
+stepsPerInterval=tapply(temp$steps,temp$interval,
+                            function(steps) mean(na.omit(steps)))
+intervals=unique(temp$interval)
+    
+plot(stepsPerInterval~intervals,ylim=c(0,250),
+         type='l',xlab='',ylab='',axes=F)
+box()
+axis(1);axis(2)
+mtext('Weekend')
 }
-mtext('Daily Activity Time Series',outer=T,side=3)
+mtext('Daily Activity Time Series',outer=T,side=3,font=2)
 mtext('Interval',outer=T,side=1)
 mtext('Mean Number of Steps',outer=T,side=2)
 ```
