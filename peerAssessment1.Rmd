@@ -1,5 +1,9 @@
-Peer Assessment 1
-=======================
+---
+title: "Reproducible Research: Peer Assessment 1"
+output: 
+  html_document:
+    keep_md: true
+---
 
 ```{r setwd, echo=FALSE}
 rm(list=ls());gc()
@@ -46,7 +50,10 @@ plot(stepsPerInterval~intervals,main='Daily Activity Time Series',
 
 ##Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
-First, deal with missing values in the dataset
+Interval ```r which(stepsPerInterval==max(stepsPerInterval))``` contains the maximum
+number of steps.
+
+#Imputting missing values
 ```{r count missing values}
 dataNA=which(is.na(activity$steps))
 ```
