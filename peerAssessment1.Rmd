@@ -19,15 +19,16 @@ activity$date=as.Date(activity$date)
 #What is mean total number of steps taken per day?
 
 ```{r histogram}
-
+par(mfrow=c(1,1),mar=c(5,4,2,2))
 stepsPerDay=tapply(activity$steps,activity$date,sum)
+stepsPerDay=stepsPerDay[which(!is.na(stepsPerDay))]
 
 hist(stepsPerDay,col=rgb(.5,.5,.5),breaks=20,
      xlab='Number of steps',main='Number of steps taken per day')
 ```
 
-The mean number of steps taken each day is ```r mean(na.omit(stepsPerDay))```.  
-The median number of steps taken each day is ```r median(na.omit(stepsPerDay))```.
+The mean number of steps taken each day is ```r mean(stepsPerDay)```.  
+The median number of steps taken each day is ```r median(stepsPerDay)```.
 
 #What is the average daily activity pattern?
 
@@ -87,7 +88,7 @@ activityNoNA$weekend='weekday'
 activityNoNA[which(is.element(activityNoNA$dayName,c('Saturday','Sunday'))),
              'weekend']='weekend'
 
-par(mfrow=c(2,1),oma=c(0,0,3,0))
+par(mfrow=c(2,1),oma=c(2,2,3,0),mar=c(2,3,2,3))
 for(i in c('weekday','weekend')){
     temp=activityNoNA[which(activityNoNA$weekend==i),]
     
@@ -95,11 +96,13 @@ for(i in c('weekday','weekend')){
                             function(steps) mean(na.omit(steps)))
     intervals=unique(temp$interval)
     
-    plot(stepsPerInterval~intervals,main=i,ylim=c(0,max(stepsPerInterval)),
-         xlab='Interval',ylab='Mean number of steps',type='l')
+    plot(stepsPerInterval~intervals,main=i,ylim=c(0,250),
+         type='l',xlab='',ylab='')
 
 }
-mtext('Daily Activity Time Series',outer=T)
+mtext('Daily Activity Time Series',outer=T,side=3)
+mtext('Interval',outer=T,side=1)
+mtext('Mean Number of Steps',outer=T,side=2)
 ```
 
 
